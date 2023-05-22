@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 // создаём класс для клиентов
 class Client
@@ -53,7 +55,7 @@ class Client
         {
             Console.WriteLine("Ф.И.О: " + people[i].getName() + "\nПол: "
                               + people[i].getPol() + "\nГод: " + people[i].getYear() 
-                              + "\nГород: " + people[i].getSity() + "\nДиагноз: " 
+                              + "\nМесто прооживания: " + people[i].getSity() + "\nДиагноз: " 
                               + people[i].getDiagnosis());
 			Console.WriteLine("--------");
         }
@@ -63,8 +65,8 @@ class Client
     public static void IfNotBarnaulPrint(List<Client> people) {
         for (int i = 0; i < people.Count; i++)
         {
-            if (people[i].getSity() != ("Барнаул")) {
-                Console.WriteLine("Ф.И.О: " + people[i].getName() + "\tГород: " + people[i].getSity());
+            if (people[i].getSity() != ("город")) {
+                Console.WriteLine("Ф.И.О: " + people[i].getName() + "\tМесто прооживания: " + people[i].getSity());
             }
         }
     }
@@ -92,34 +94,149 @@ class Client
     //вывод из файла
     public static void PrintRes(StreamReader fin){
 		string N;
-        List<string> check = new List<string>();
+        int count = 0;
+
         while ((N = fin.ReadLine()) != null) {
-            Console.WriteLine(N);
+            if (count == 0)
+            {
+                Console.WriteLine("Ф.И.О.: " + N);
+            }
+            else if (count == 1)
+            {
+                Console.WriteLine("Возраст: " + N);
+            }
+            else if (count == 2)
+            {
+                Console.WriteLine("Диагноз: " + N + "\n");
+            }
+            else
+            {
+                count = 0;
+            }
+            count++;
         }
     }
 
     //удалить из файла инногороднего клиента
-    public static void DeletePeopleIfNotBarnaulWithFile(List<Client> people, StreamWriter inputFinalFin){
+    public static void DeletePeopleIfNotBarnaulWithFile(List<Client> people, StreamWriter inputFinalFin)
+    {
         for (int i = 0; i < people.Count; i++)
         {
-            if (people[i].getSity() == ("Барнаул")) {
+            if (people[i].getSity() == ("город")) {
                 inputFinalFin.WriteLine(people[i].getName() + "\n" + people[i].getPol() 
                                         + "\n" + people[i].getYear() + "\n" + people[i].getSity() 
                                         + "\n" + people[i].getDiagnosis() + "\n");
-            }else{
-				people.RemoveAt(i);
-			}
+            }
+            else
+            {
+                people.RemoveAt(i);
+                i--;
+            }
         }
+    }
+
+    public static List<Client> AddPeople(List<Client> people)
+    {
+        Console.WriteLine("Заполните данные о пациенте");
+
+
+        Client first = new Client();
+
+        Console.Write("Введите Ф.И.О. - ");
+        string name = Console.ReadLine();
+        first.setName(name);
+
+        Console.Write("Введите пол - ");
+        string pol = Console.ReadLine();
+        first.setPol(pol);
+
+        Console.Write("Введите возраст - ");
+        int year;
+        while (!int.TryParse(Console.ReadLine(), out year)) Console.WriteLine("введите число!");
+        first.setYear(year);
+
+        Console.Write("Введите место проживания (город, село) - ");
+        string sity = Console.ReadLine();
+        first.setSity(sity);
+
+        Console.Write("Введите диагноз - ");
+        string diagnosis = Console.ReadLine();
+        first.setDiagnosis(diagnosis);
+
+        people.Add(first);
+
+
+        try
+        {
+            using (StreamWriter fin = new StreamWriter(@"C:\Users\setInterval\Desktop\C++\semestr_2\Новая папка\C#\test.txt"))
+            {
+                Client.WriteInFile(people, fin);
+            }
+        }
+        catch (IOException e)
+        {
+            Console.WriteLine($"The file could not be opened: '{e}'");
+        }
+
+        return people;
     }
 
     // изменить диагноз
     public static void RemakeDiagnos(List<Client> people){
-        Console.WriteLine("Изменить диагноз? д/н");
-        char test = Convert.ToChar(Console.ReadLine());
-        if (test == 'д') {
-            // перезаписываем диагноз
-            HelloWorld.remake(people);
+        // перезаписываем диагноз
+        HelloWorld.remake(people);
+    }
+
+    public static List<Client> ScanFromFile(StreamReader printFout)
+    {
+        List<string> check = new List<string>();
+        List<Client> people = new List<Client>();
+
+        string N;
+        while ((N = printFout.ReadLine()) != null)
+        {
+            check.Add(N);
         }
+
+        for (int i = 0; i < check.Count; i += 6)
+        {
+            Client first = new Client();
+            first.setName(check[i]);
+            first.setPol(check[i + 1]);
+            first.setYear(Convert.ToInt32(check[i + 2]));
+            first.setSity(check[i + 3]);
+            first.setDiagnosis(check[i + 4]);
+            people.Add(first);
+        }
+        printFout.Close();
+
+        return people;
+    }
+
+    public static bool updateFlag(bool flagMenu)
+    {
+        return flagMenu = true;
+    }
+
+    public static List<Client> ConsoleWrite(List<Client> people)
+    {
+        Console.WriteLine( "Заполнить данные пациентов");
+
+        // заполняем стартовый массив
+        try
+        {
+            using (StreamWriter fin = new StreamWriter(@"C:\Users\setInterval\Desktop\C++\semestr_2\Новая папка\C#\test.txt"))
+            {
+                people = Client.ConsoleWritePeople();
+                Client.WriteInFile(people, fin);
+            }
+        }
+        catch (IOException e)
+        {
+            Console.WriteLine($"The file could not be opened: '{e}'");
+        }
+
+        return people;
     }
 
     // консольно заполнить массив клиентов
@@ -148,7 +265,7 @@ class Client
             while (!int.TryParse(Console.ReadLine(), out year)) Console.WriteLine("введите число!");
             first.setYear(year);
 
-            Console.Write("Введите город - ");
+            Console.Write("Введите место проживания (город, село) - ");
             string sity = Console.ReadLine();
 			first.setSity(sity);
 
@@ -168,16 +285,19 @@ class Client
         {
             fout.WriteLine(people[i].getName() + "\n" + people[i].getPol() 
                            + "\n" + people[i].getYear() + "\n" + people[i].getSity() 
-                           + "\n" + people[i].getDiagnosis() + "\n\n");
+                           + "\n" + people[i].getDiagnosis() + "\n");
         }
+        fout.Close();
     }
 };
 class HelloWorld {
     // функция изменения диагноза
     public static void remake(List<Client> people){
         string fio, diagnosisNew;
+        Console.WriteLine("Введите ФИО - ");
         fio = Console.ReadLine();
-		diagnosisNew = Console.ReadLine();
+        Console.WriteLine("Введите диагноз - ");
+        diagnosisNew = Console.ReadLine();
 
 		for (int i = 0; i < people.Count; i++)
 		{
@@ -193,115 +313,186 @@ class HelloWorld {
       System.Console.OutputEncoding = System.Text.Encoding.UTF8;
       System.Console.InputEncoding = enc1251;
 
-
-      Console.WriteLine("Заполнить данные пациентов");
       // people массив под клиентов
       List<Client> people = new List<Client>();
+      bool flagMenu = false;
 
-	int age = 0;
+      int age = 0;
 
-    // заполняем стартовый массив
-    try
-    {
-	    using (StreamWriter fin = new StreamWriter(@"C:\Users\setInterval\Desktop\C++\semestr_2\Новая папка\C#\test.txt")){
-		    people = Client.ConsoleWritePeople();
-		    Client.WriteInFile(people, fin);
-		    fin.Close();
-	    }
-	}catch(IOException e){
-		Console.WriteLine($"The file could not be opened: '{e}'");
-	}
+    
 	
     // бесконечный цикл для реализации меню
 	while(true){
         // текст меню
-		Console.WriteLine( "1. Выдать на экран содержимое файла\n" +
-							"2. Выдать на экран список всех иногородних пациентов\n" +
-							"3. Создать файл пациентов больше заданого возраста\n" +
-							"4. Распечатать файл пациентов больше заданого возраста\n" +
-							"5. Добавить пациентов больше заданого возраста в исходный файл\n" +
-							"6. Удалить все элементы записи инногородних пациентов\n" +
-							"7. Изменить диагноз у определённого пациетна\n" +
-							"8. Выход"
-		);
-		String numberFunctionInput = Console.ReadLine();
+		Console.WriteLine("1. Считать содержимое из файла\n" +
+                          "2. Заполнить пациентов через консоль\n" +
+                          "3. Выдать на экран содержимое файла\n" +
+                          "4. Выдать на экран список всех иногородних пациентов\n" +
+                          "5. Создать файл пациентов больше заданого возраста\n" +
+                          "6. Распечатать файл пациентов больше заданого возраста\n" +
+                          "7. Добавить данные нового пациента\n" +
+                          "8. Удалить все элементы записи инногородних пациентов\n" +
+                          "9. Изменить диагноз у определённого пациетна\n" +
+                          "10. Выход"
+        );
+		string numberFunctionInput = Console.ReadLine();
 		switch(numberFunctionInput){
-			case("1"):
-				// выводим, что заполнили
-				Client.PrintClient(people);
-				break;
-			case("2"):
-				// Проверка на инногородних и выводим их
-				Client.IfNotBarnaulPrint(people);
-				break;
-			case("3"):
-				// запрашиваем возраст
-				Console.Write("Введите возраст (выведутся пациенты больше или такому же значению) - ");
-                while (!int.TryParse(Console.ReadLine(), out age)) Console.WriteLine("введите число!");
-				try{
-					using (StreamWriter fin = new StreamWriter(@"C:\Users\setInterval\Desktop\C++\semestr_2\Новая папка\C#\res.txt")){
-						// записываем в другой файл >= age	
-						Client.InputHighAgeInFile(fin, people, age);
-						fin.Close();
-					}
-				}catch(IOException e){
-					Console.WriteLine($"The file could not be opened: '{e}'");
-				} 
+            case ("1"):
+                try{
+                    people = Client.ScanFromFile(new StreamReader(@"C:\Users\setInterval\Desktop\C++\semestr_2\Новая папка\C#\test.txt"));
+                    flagMenu = Client.updateFlag(flagMenu);
+                }catch (IOException e)
+                {
+                    Console.WriteLine($"The file could not be opened: '{e}'");
+                }
+                break;
+            case ("2"):
+                try{
+                    File.WriteAllText(@"C:\Users\setInterval\Desktop\C++\semestr_2\Новая папка\C#\test.txt", string.Empty);
+                    people = Client.ConsoleWrite(people);
+                    flagMenu = Client.updateFlag(flagMenu);
+                }catch (IOException e){
+                    Console.WriteLine($"The file could not be opened: '{e}'");
+                }
+                break;
+            case ("3"):
+                if (flagMenu)
+                {
+                    // выводим, что заполнили
+                    Client.PrintClient(people);
+                }
+                else
+                {
+                    Console.WriteLine("Заполнете список пациентов консольно или через файл test.txt");
+                }
+				
 				break;
 			case("4"):
-                // распечатать файл пациентов больше заданого возраста
-				try{
-					using (StreamReader fin = new StreamReader(@"C:\Users\setInterval\Desktop\C++\semestr_2\Новая папка\C#\res.txt")){
-						Client.PrintRes(fin);
-						fin.Close();
-					}
-					
-				}catch(IOException e){
-					Console.WriteLine($"The file could not be opened: '{e}'");
-				}
-				break;
+                if (flagMenu)
+                {
+                    // Проверка на инногородних и выводим их
+                    Client.IfNotBarnaulPrint(people);
+                    }
+                else
+                {
+                    Console.WriteLine("Заполнете список пациентов консольно или через файл test.txt");
+                }
+                break;
 			case("5"):
-				try{
-					using (StreamWriter fin = new StreamWriter(@"C:\Users\setInterval\Desktop\C++\semestr_2\Новая папка\C#\test.txt", true)){
-						// добавляем >= age в исходный файл
-						Client.HigtAgeInFile(fin, new StreamReader(@"C:\Users\setInterval\Desktop\C++\semestr_2\Новая папка\C#\res.txt"));
-						fin.Close();
-					}
-				}catch(IOException e){
-					Console.WriteLine($"The file could not be opened: '{e}'");
-				}
-				break;
+                if (flagMenu)
+                {
+                    // запрашиваем возраст
+                    Console.Write("Введите возраст (выведутся пациенты больше или такому же значению) - ");
+                    while (!int.TryParse(Console.ReadLine(), out age)) Console.WriteLine("введите число!");
+                    try
+                    {
+                        using (StreamWriter fin = new StreamWriter(@"C:\Users\setInterval\Desktop\C++\semestr_2\Новая папка\C#\res.txt"))
+                        {
+                            // записываем в другой файл >= age	
+                            Client.InputHighAgeInFile(fin, people, age);
+                            fin.Close();
+                        }
+                    }
+                    catch (IOException e)
+                    {
+                        Console.WriteLine($"The file could not be opened: '{e}'");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Заполнете список пациентов консольно или через файл test.txt");
+                }
+                break;
 			case("6"):
-				try{
-					// отчищаем файл
-					File.WriteAllText(@"C:\Users\setInterval\Desktop\C++\semestr_2\Новая папка\C#\test.txt", string.Empty);
-					using (StreamWriter fin = new StreamWriter(@"C:\Users\setInterval\Desktop\C++\semestr_2\Новая папка\C#\test.txt", true)){
-						
-						// удаляем записи иногородних
-						Client.DeletePeopleIfNotBarnaulWithFile(people, fin);
-                        Client.HigtAgeInFile(fin, new StreamReader(@"C:\Users\setInterval\Desktop\C++\semestr_2\Новая папка\C#\res.txt"));
-                        fin.Close();
-					}
-				}catch(IOException e){
-					Console.WriteLine($"The file could not be opened: '{e}'");
-				}
-				break;
+                if (flagMenu)
+                {
+                    // распечатать файл пациентов больше заданого возраста
+                    try
+                    {
+                        using (StreamReader fin = new StreamReader(@"C:\Users\setInterval\Desktop\C++\semestr_2\Новая папка\C#\res.txt"))
+                        {
+                            Client.PrintRes(fin);
+                            fin.Close();
+                        }
+
+                    }
+                    catch (IOException e)
+                    {
+                        Console.WriteLine($"The file could not be opened: '{e}'");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Заполнете список пациентов консольно или через файл test.txt");
+                }
+                break;
 			case("7"):
-				try{
-					// отчищаем файл
-					File.WriteAllText(@"C:\Users\setInterval\Desktop\C++\semestr_2\Новая папка\C#\test.txt", string.Empty);
-					using (StreamWriter fin = new StreamWriter(@"C:\Users\setInterval\Desktop\C++\semestr_2\Новая папка\C#\test.txt", true)){
-                        // надо ли перезаписывать диагноз
-						Client.RemakeDiagnos(people);
-						Client.WriteInFile(people, fin);
-                        Client.HigtAgeInFile(fin, new StreamReader(@"C:\Users\setInterval\Desktop\C++\semestr_2\Новая папка\C#\res.txt"));
-                        fin.Close();
-					}
-				}catch(IOException e){
-					Console.WriteLine($"The file could not be opened: '{e}'");
-				}
-				break;
+                if (flagMenu)
+                {
+                    try
+                    {
+                        people = Client.AddPeople(people);
+                    }
+                    catch (IOException e)
+                    {
+                        Console.WriteLine($"The file could not be opened: '{e}'");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Заполнете список пациентов консольно или через файл test.txt");
+                }
+                break;
 			case("8"):
+                if (flagMenu)
+                {
+                    try
+                    {
+                        // отчищаем файл
+                        File.WriteAllText(@"C:\Users\setInterval\Desktop\C++\semestr_2\Новая папка\C#\test.txt", string.Empty);
+                        using (StreamWriter fin = new StreamWriter(@"C:\Users\setInterval\Desktop\C++\semestr_2\Новая папка\C#\test.txt", true))
+                        {
+                            // удаляем записи иногородних
+                            Client.DeletePeopleIfNotBarnaulWithFile(people, fin);
+                            fin.Close();
+                        }
+                    }
+                    catch (IOException e)
+                    {
+                        Console.WriteLine($"The file could not be opened: '{e}'");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Заполнете список пациентов консольно или через файл test.txt");
+                }
+                break;
+			case("9"):
+                if (flagMenu)
+                {
+                    try
+                    {
+                        // отчищаем файл
+                        File.WriteAllText(@"C:\Users\setInterval\Desktop\C++\semestr_2\Новая папка\C#\test.txt", string.Empty);
+                        using (StreamWriter fin = new StreamWriter(@"C:\Users\setInterval\Desktop\C++\semestr_2\Новая папка\C#\test.txt", true))
+                        {
+                            // надо ли перезаписывать диагноз
+                            Client.RemakeDiagnos(people);
+                            Client.WriteInFile(people, fin);
+                            fin.Close();
+                        }
+                    }
+                    catch (IOException e)
+                    {
+                        Console.WriteLine($"The file could not be opened: '{e}'");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Заполнете список пациентов консольно или через файл test.txt");
+                }
+                break;
+			case("10"):
                 // выход из программы
 				Environment.Exit(0);
 				break;

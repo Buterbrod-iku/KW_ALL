@@ -87,7 +87,7 @@ public:
 	static void HigtAgeInFile(ofstream inputFin, ifstream printFout) {
 		string N;
 		// добавляем >= age в исходный файл
-		while(getline(printFout, N)) {
+		while (getline(printFout, N)) {
 			inputFin << N << endl;
 		}
 		printFout.close();
@@ -100,7 +100,7 @@ public:
 		int count = 0;
 		while (getline(fin, N)) {
 			if (count == 0) {
-				cout << "Ф.И.О.: " << N  << endl;
+				cout << "Ф.И.О.: " << N << endl;
 			}
 			else if (count == 1) {
 				cout << "Возраст: " << N << endl;
@@ -109,7 +109,7 @@ public:
 				cout << "Диагноз: " << N << endl;
 			}
 			else {
-				count = 0;
+				count = -1;
 			}
 
 			count++;
@@ -117,11 +117,11 @@ public:
 		fin.close();
 	}
 
-	static void DeletePeopleIfNotBarnaulWithFile(vector<Client> people, ofstream inputFinalFin) {
+	static vector<Client> DeletePeopleIfNotBarnaulWithFile(vector<Client> people, ofstream inputFinalFin) {
 		for (int i = 0; i < people.size(); i++)
 		{
 			if (people[i].getSity() == ("город")) {
-				inputFinalFin << people[i].getName() << endl << people[i].getPol() << endl << people[i].getYear() << endl << people[i].getSity() << endl << people[i].getDiagnosis() << endl;
+				inputFinalFin << people[i].getName() << endl << people[i].getPol() << endl << people[i].getYear() << endl << people[i].getSity() << endl << people[i].getDiagnosis() << endl << endl;
 			}
 			else {
 				people.erase(people.begin() + i);
@@ -129,9 +129,11 @@ public:
 			}
 		}
 		inputFinalFin.close();
+
+		return people;
 	}
 
-	static vector<Client> AddPeople(vector<Client> people){
+	static vector<Client> AddPeople(vector<Client> people) {
 		cout << "Заполнить данные пациентa" << endl;
 
 		// заполняем массив клиентов
@@ -175,7 +177,7 @@ public:
 		try {
 			// отчищаем файл
 			// надо ли перезаписывать диагноз
-			WriteInFile(people, ofstream("C:/Users/Buterbrod/Desktop/C++/semestr_2/Новая папка/kurs/test.txt"));
+			WriteInFile(people, ofstream("C:/Users/mvideo/Desktop/kurs/kurs/test.txt"));
 		}
 		catch (char* name) {
 			cout << "The file could not be opened: " << name << endl;
@@ -184,7 +186,7 @@ public:
 		return people;
 	}
 
-	static void RemakeDiagnos(vector<Client> people) {
+	static vector<Client> RemakeDiagnos(vector<Client> people) {
 		// перезаписываем диагноз
 		/*remake(people);*/
 		string fio, diagnosisNew;
@@ -200,6 +202,8 @@ public:
 				people[i].setDiagnosis(diagnosisNew);
 			}
 		}
+
+		return people;
 	}
 
 	static vector<Client> ConsoleWritePeople() {
@@ -234,7 +238,7 @@ public:
 
 
 			cout << "Введите возраст - ";
-			cin >> year;	
+			cin >> year;
 			while (cin.fail())
 			{
 				cin.clear();
@@ -244,7 +248,7 @@ public:
 				cin >> year;
 			}
 			first.setYear(year);
-			
+
 			while ((getchar()) != '\n');
 
 			cout << "Введите место проживания (город, село) - ";
@@ -261,23 +265,23 @@ public:
 		return people;
 	}
 
-	static vector<Client> ConsoleWrite(vector<Client> people){
+	static vector<Client> ConsoleWrite(vector<Client> people) {
 		cout << "Заполнить данные пациентов" << endl;
 
 		try {
 			// отчищаем файл
 			// надо ли перезаписывать диагноз
 			people = ConsoleWritePeople();
-			WriteInFile(people, ofstream("C:/Users/Buterbrod/Desktop/C++/semestr_2/Новая папка/kurs/test.txt"));
+			WriteInFile(people, ofstream("C:/Users/mvideo/Desktop/kurs/kurs/test.txt"));
 		}
 		catch (char* name) {
-			cout << "The file could not be opened: " << name << endl;
+			cout << "Не удалось открыть файл!!" << endl;
 		}
 
 		return people;
 	}
 
-	static vector<Client> ScanFromFile(ifstream printFout){
+	static vector<Client> ScanFromFile(ifstream printFout) {
 		vector<string> check;
 		vector<Client> people;
 
@@ -315,6 +319,10 @@ public:
 
 int main()
 {
+	// подключаем русский язык
+	SetConsoleCP(1251);
+	SetConsoleOutputCP(1251);
+
 	// people массив под клиентов
 	vector <Client> people;
 	int age = 0;
@@ -323,25 +331,25 @@ int main()
 
 	while (true) {
 		cout << "1. Считать содержимое из файла\n" <<
-				"2. Заполнить пациентов через консоль\n" <<
-				"3. Выдать на экран содержимое файла\n" <<
-				"4. Выдать на экран список всех иногородних пациентов\n" <<
-				"5. Создать файл пациентов больше заданого возраста\n" <<
-				"6. Распечатать файл пациентов больше заданого возраста\n" <<
-				"7. Добавить пациентов больше заданого возраста в исходный файл\n" <<
-				"8. Удалить все элементы записи инногородних пациентов\n" <<
-				"9. Изменить диагноз у определённого пациетна\n" <<
-				"10. Выход" << endl;
+			"2. Заполнить пациентов через консоль\n" <<
+			"3. Выдать на экран содержимое файла\n" <<
+			"4. Выдать на экран список всех иногородних пациентов\n" <<
+			"5. Создать файл пациентов больше заданого возраста\n" <<
+			"6. Распечатать файл пациентов больше заданого возраста\n" <<
+			"7. Добавить данные нового пациента\n" <<
+			"8. Удалить все элементы записи инногородних пациентов\n" <<
+			"9. Изменить диагноз у определённого пациетна\n" <<
+			"в. Выход" << endl;
 		char task;
 		cin >> task;
 		switch (task) {
 		case '1':
 			try {
-				people = clas.ScanFromFile(ifstream("C:/Users/Buterbrod/Desktop/C++/semestr_2/Новая папка/kurs/res.txt"));
+				people = clas.ScanFromFile(ifstream("C:/Users/mvideo/Desktop/kurs/kurs/test.txt"));
 				flagMenu = clas.updateFlag(flagMenu);
 			}
 			catch (char* name) {
-				cout << "The file could not be opened: " << name << endl;
+				cout << "Не удалось открыть файл!!" << endl;
 			}
 			break;
 		case '2':
@@ -350,7 +358,7 @@ int main()
 				flagMenu = clas.updateFlag(flagMenu);
 			}
 			catch (char* name) {
-				cout << "The file could not be opened: " << name << endl;
+				cout << "Не удалось открыть файл!!" << endl;
 			}
 			break;
 		case '3':
@@ -376,12 +384,19 @@ int main()
 				// запрашиваем возраст
 				cout << "Введите возраст (выведутся пациенты больше или такому же значению) - ";
 				cin >> age;
+				while (cin.fail()) {
+					cin.clear();
+					cin.ignore(999999999, '\n');
+					cout << "Введите значение повторно:";
+					cin >> age;
+				}
+
 				try {
 					// записываем в другой файл >= age	
-					clas.InputHighAgeInFile(ofstream("C:/Users/Buterbrod/Desktop/C++/semestr_2/Новая папка/kurs/res.txt"), people, age);
+					clas.InputHighAgeInFile(ofstream("C:/Users/mvideo/Desktop/kurs/kurs/res.txt"), people, age);
 				}
 				catch (char* name) {
-					cout << "The file could not be opened: " << name << endl;
+					cout << "Не удалось открыть файл!!" << endl;
 				}
 			}
 			else {
@@ -391,10 +406,10 @@ int main()
 		case '6':
 			if (flagMenu) {
 				try {
-					clas.PrintRes(ifstream("C:/Users/Buterbrod/Desktop/C++/semestr_2/Новая папка/kurs/res.txt"));
+					clas.PrintRes(ifstream("C:/Users/mvideo/Desktop/kurs/kurs/res.txt", ios::app));
 				}
 				catch (char* name) {
-					cout << "The file could not be opened: " << name << endl;
+					cout << "Не удалось открыть файл!!" << endl;
 				}
 			}
 			else {
@@ -408,7 +423,7 @@ int main()
 					people = clas.AddPeople(people);
 				}
 				catch (char* name) {
-					cout << "The file could not be opened: " << name << endl;
+					cout << "Не удалось открыть файл!!" << endl;
 				}
 			}
 			else {
@@ -420,10 +435,10 @@ int main()
 				try {
 					// отчищаем файл
 					// удаляем записи инногородних
-					clas.DeletePeopleIfNotBarnaulWithFile(people, ofstream("C:/Users/Buterbrod/Desktop/C++/semestr_2/Новая папка/kurs/test.txt"));
+					people = clas.DeletePeopleIfNotBarnaulWithFile(people, ofstream("C:/Users/mvideo/Desktop/kurs/kurs/test.txt"));
 				}
 				catch (char* name) {
-					cout << "The file could not be opened: " << name << endl;
+					cout << "Не удалось открыть файл!!" << endl;
 				}
 			}
 			else {
@@ -435,18 +450,18 @@ int main()
 				try {
 					// отчищаем файл
 					// надо ли перезаписывать диагноз
-					clas.RemakeDiagnos(people);
-					clas.WriteInFile(people, ofstream("C:/Users/Buterbrod/Desktop/C++/semestr_2/Новая папка/kurs/test.txt"));
+					people = clas.RemakeDiagnos(people);
+					clas.WriteInFile(people, ofstream("C:/Users/mvideo/Desktop/kurs/kurs/test.txt"));
 				}
 				catch (char* name) {
-					cout << "The file could not be opened: " << name << endl;
+					cout << "Не удалось открыть файл!!" << endl;
 				}
 			}
 			else {
 				cout << "Заполнете список пациентов консольно или через файл test.txt" << endl;
 			}
 			break;
-		case '10':
+		case 'в':
 			exit(3);
 			break;
 		default:

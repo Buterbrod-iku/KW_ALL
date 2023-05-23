@@ -81,16 +81,6 @@ class Client
         }
     }
 
-    // добавляем >= age в исходный файл
-    public static void HigtAgeInFile(StreamWriter inputFin, StreamReader printFout){
-		string N;
-        // добавляем >= age в исходный файл
-        while ((N = printFout.ReadLine()) != null) {
-            inputFin.WriteLine(N);
-        }
-		printFout.Close();
-    }
-
     //вывод из файла
     public static void PrintRes(StreamReader fin){
 		string N;
@@ -107,11 +97,11 @@ class Client
             }
             else if (count == 2)
             {
-                Console.WriteLine("Диагноз: " + N + "\n");
+                Console.WriteLine("Диагноз: " + N);
             }
             else
             {
-                count = 0;
+                count = -1;
             }
             count++;
         }
@@ -168,7 +158,7 @@ class Client
 
         try
         {
-            using (StreamWriter fin = new StreamWriter(@"C:\Users\setInterval\Desktop\C++\semestr_2\Новая папка\C#\test.txt"))
+            using (StreamWriter fin = new StreamWriter(@"C:\Users\mvideo\Desktop\C#\test.txt"))
             {
                 Client.WriteInFile(people, fin);
             }
@@ -221,11 +211,11 @@ class Client
     public static List<Client> ConsoleWrite(List<Client> people)
     {
         Console.WriteLine( "Заполнить данные пациентов");
-
         // заполняем стартовый массив
+        
         try
         {
-            using (StreamWriter fin = new StreamWriter(@"C:\Users\setInterval\Desktop\C++\semestr_2\Новая папка\C#\test.txt"))
+            using (StreamWriter fin = new StreamWriter(@"C:\Users\mvideo\Desktop\C#\test.txt"))
             {
                 people = Client.ConsoleWritePeople();
                 Client.WriteInFile(people, fin);
@@ -233,7 +223,7 @@ class Client
         }
         catch (IOException e)
         {
-            Console.WriteLine($"The file could not be opened: '{e}'");
+            Console.WriteLine($"Не удалось открыть файл!!");
         }
 
         return people;
@@ -339,20 +329,30 @@ class HelloWorld {
 		switch(numberFunctionInput){
             case ("1"):
                 try{
-                    people = Client.ScanFromFile(new StreamReader(@"C:\Users\setInterval\Desktop\C++\semestr_2\Новая папка\C#\test.txt"));
+                    people = Client.ScanFromFile(new StreamReader(@"C:\Users\mvideo\Desktop\C#\test.txt"));
                     flagMenu = Client.updateFlag(flagMenu);
                 }catch (IOException e)
                 {
-                    Console.WriteLine($"The file could not be opened: '{e}'");
+                    Console.WriteLine("Начального файла нет");
+                    FileInfo fileInfo = new FileInfo(@"C:\Users\mvideo\Desktop\C#\test.txt");
+                    FileStream fs = fileInfo.Create();
+                    fs.Close();
+                    people = Client.ConsoleWrite(people);
+                    flagMenu = Client.updateFlag(flagMenu);
+                    Console.WriteLine($"Файл создан");
                 }
                 break;
             case ("2"):
                 try{
-                    File.WriteAllText(@"C:\Users\setInterval\Desktop\C++\semestr_2\Новая папка\C#\test.txt", string.Empty);
                     people = Client.ConsoleWrite(people);
                     flagMenu = Client.updateFlag(flagMenu);
                 }catch (IOException e){
-                    Console.WriteLine($"The file could not be opened: '{e}'");
+                    FileInfo fileInfo = new FileInfo(@"C:\Users\mvideo\Desktop\C#\test.txt");
+                    FileStream fs = fileInfo.Create();
+                    fs.Close();
+                    people = Client.ConsoleWrite(people);
+                    flagMenu = Client.updateFlag(flagMenu);
+                    Console.WriteLine($"Файл создан");
                 }
                 break;
             case ("3"):
@@ -386,7 +386,7 @@ class HelloWorld {
                     while (!int.TryParse(Console.ReadLine(), out age)) Console.WriteLine("введите число!");
                     try
                     {
-                        using (StreamWriter fin = new StreamWriter(@"C:\Users\setInterval\Desktop\C++\semestr_2\Новая папка\C#\res.txt"))
+                        using (StreamWriter fin = new StreamWriter(@"C:\Users\mvideo\Desktop\C#\res.txt"))
                         {
                             // записываем в другой файл >= age	
                             Client.InputHighAgeInFile(fin, people, age);
@@ -395,7 +395,11 @@ class HelloWorld {
                     }
                     catch (IOException e)
                     {
-                        Console.WriteLine($"The file could not be opened: '{e}'");
+                        File.Create(@"C:\Users\mvideo\Desktop\C#\res.txt");
+                        StreamWriter fin = new StreamWriter(@"C:\Users\mvideo\Desktop\C#\res.txt");
+                        Client.InputHighAgeInFile(fin, people, age);
+                        fin.Close();
+                        Console.WriteLine($"Не удалось открыть файл!!");
                     }
                 }
                 else
@@ -409,7 +413,7 @@ class HelloWorld {
                     // распечатать файл пациентов больше заданого возраста
                     try
                     {
-                        using (StreamReader fin = new StreamReader(@"C:\Users\setInterval\Desktop\C++\semestr_2\Новая папка\C#\res.txt"))
+                        using (StreamReader fin = new StreamReader(@"C:\Users\mvideo\Desktop\C#\res.txt"))
                         {
                             Client.PrintRes(fin);
                             fin.Close();
@@ -418,7 +422,7 @@ class HelloWorld {
                     }
                     catch (IOException e)
                     {
-                        Console.WriteLine($"The file could not be opened: '{e}'");
+                        Console.WriteLine($"Не удалось открыть файл!!");
                     }
                 }
                 else
@@ -435,7 +439,7 @@ class HelloWorld {
                     }
                     catch (IOException e)
                     {
-                        Console.WriteLine($"The file could not be opened: '{e}'");
+                        Console.WriteLine($"Не удалось открыть файл!!");
                     }
                 }
                 else
@@ -449,8 +453,8 @@ class HelloWorld {
                     try
                     {
                         // отчищаем файл
-                        File.WriteAllText(@"C:\Users\setInterval\Desktop\C++\semestr_2\Новая папка\C#\test.txt", string.Empty);
-                        using (StreamWriter fin = new StreamWriter(@"C:\Users\setInterval\Desktop\C++\semestr_2\Новая папка\C#\test.txt", true))
+                        File.WriteAllText(@"C:\Users\mvideo\Desktop\C#\test.txt", string.Empty);
+                        using (StreamWriter fin = new StreamWriter(@"C:\Users\mvideo\Desktop\C#\test.txt", true))
                         {
                             // удаляем записи иногородних
                             Client.DeletePeopleIfNotBarnaulWithFile(people, fin);
@@ -459,7 +463,7 @@ class HelloWorld {
                     }
                     catch (IOException e)
                     {
-                        Console.WriteLine($"The file could not be opened: '{e}'");
+                        Console.WriteLine($"Не удалось открыть файл!!");
                     }
                 }
                 else
@@ -473,8 +477,8 @@ class HelloWorld {
                     try
                     {
                         // отчищаем файл
-                        File.WriteAllText(@"C:\Users\setInterval\Desktop\C++\semestr_2\Новая папка\C#\test.txt", string.Empty);
-                        using (StreamWriter fin = new StreamWriter(@"C:\Users\setInterval\Desktop\C++\semestr_2\Новая папка\C#\test.txt", true))
+                        File.WriteAllText(@"C:\Users\mvideo\Desktop\C#\test.txt", string.Empty);
+                        using (StreamWriter fin = new StreamWriter(@"C:\Users\mvideo\Desktop\C#\test.txt", true))
                         {
                             // надо ли перезаписывать диагноз
                             Client.RemakeDiagnos(people);
@@ -484,7 +488,7 @@ class HelloWorld {
                     }
                     catch (IOException e)
                     {
-                        Console.WriteLine($"The file could not be opened: '{e}'");
+                        Console.WriteLine($"Не удалось открыть файл!!");
                     }
                 }
                 else

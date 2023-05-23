@@ -76,7 +76,7 @@ class Client
         for (int i = 0; i < people.size(); i++)
         {
             if (people.get(i).getYear() >= ageNew) {
-                fout.write(people.get(i).getName() + "\n" + people.get(i).getYear() + "\n" + people.get(i).getDiagnosis() + "\n");
+                fout.write(people.get(i).getName() + "\n" + people.get(i).getYear() + "\n" + people.get(i).getDiagnosis() + "\n\n");
             }
         }
         fout.flush();
@@ -109,7 +109,7 @@ class Client
             } else if(count == 2){
                 System.out.printf("Диагноз: " + data + "\n");
             } else {
-                count = 0;
+                count = -1;
             }
 
             count++;
@@ -364,7 +364,15 @@ public class App {
                             System.out.println(ex.getMessage());
                         }
                     } else{
-                        System.out.println("Файл не найден");
+                        File file = new File("./src/test.txt");
+                        if (file.createNewFile()){
+                            System.out.println("файл создан, выполните ввод чере консоль (2 пункт меню)");
+                            people = Client.ConsoleWrite(people);
+                            flagMenu = Client.updateFlag(flagMenu);
+                        }
+                        else{
+                            System.out.println("Файл не найден");
+                        }
                     }
                     break;
                 case("2"):
@@ -377,7 +385,15 @@ public class App {
                             System.out.println(ex.getMessage());
                         }
                     } else{
-                        System.out.println("Файл не найден");
+                        File file = new File("./src/test.txt");
+                        if (file.createNewFile()){
+                            System.out.println("Файл создан, выполните ввод чере консоль (2 пункт меню)");
+                            people = Client.ConsoleWrite(people);
+                            flagMenu = Client.updateFlag(flagMenu);
+                        }
+                        else {
+                            System.out.println("Файл не найден");
+                        }
                     }
                     break;
                 case("3"):
@@ -410,7 +426,14 @@ public class App {
                             // записываем в другой файл >= age
                             Client.InputHighAgeInFile(new FileWriter("./src/res.txt"), people, age);
                         }catch(IOException ex){
-                            System.out.println(ex.getMessage());
+                            File file = new File("./src/res.txt");
+                            if (file.createNewFile()){
+                                Client.InputHighAgeInFile(new FileWriter("./src/res.txt"), people, age);
+                                System.out.println("Файл создан");
+                            }
+                            else {
+                                System.out.println("Файл не найден");
+                            }
                         }
                     } else {
                         System.out.println("Заполнете список пациентов консольно или через файл test.txt");
